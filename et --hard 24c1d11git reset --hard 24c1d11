@@ -1,0 +1,7 @@
+[33m1b1b013[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdevelop[m[33m, [m[1;31morigin/develop[m[33m)[m HEAD@{0}: reset: moving to origin/develop
+[33mbb8724f[m HEAD@{1}: checkout: moving from feature/profile-continue to develop
+[33m7e378df[m[33m ([m[1;31morigin/feature/profile-continue[m[33m, [m[1;32mfeature/profile-continue[m[33m)[m HEAD@{2}: reset: moving to origin/feature/profile-continue
+[33m24c1d11[m HEAD@{3}: pull: Fast-forward
+[33m05ad126[m HEAD@{4}: checkout: moving from develop to feature/profile-continue
+[33mbb8724f[m HEAD@{5}: checkout: moving from main to develop
+[33m16a4c9b[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m HEAD@{6}: clone: from https://github.com/AlejoGuti1122/pf-05.git
