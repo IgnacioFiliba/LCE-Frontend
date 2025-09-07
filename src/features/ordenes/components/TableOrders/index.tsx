@@ -52,7 +52,7 @@ const OrdersTable: React.FC = () => {
     pendingOrders,  // count de onPreparation
     approvedOrders, // count de approved
   } = useOrders({
-    initialParams: { status: "onPreparation"},
+    initialParams: { status: "En Preparacion"},
     autoFetch: true,
   })
 
@@ -90,9 +90,9 @@ const OrdersTable: React.FC = () => {
       filterByStatus(null)
       setFilters({ status: undefined })
     } else if (key === "approved") {
-      setFilters({ status: "approved" })
+      setFilters({ status: "Aprobada" })
     } else if (key === "onPreparation") {
-      setFilters({ status: "onPreparation" })
+      setFilters({ status: "En Preparacion" })
     }
     if (bumpState) setPage(1)
   }

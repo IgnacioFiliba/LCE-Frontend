@@ -393,9 +393,9 @@ export const useOrders = (options: UseOrdersOptions = {}): UseOrdersReturn => {
       list = list.filter(
         (o) =>
           normalize(o.id).includes(q) ||
-          normalize(o.user?.id || "").includes(q) ||
-          normalize(o.user?.email || "").includes(q) ||
-          normalize(o.user?.name || "").includes(q)
+          normalize(o.customer?.id || "").includes(q) ||
+          normalize(o.customer?.email || "").includes(q) ||
+          normalize(o.customer?.name || "").includes(q)
       )
     }
     return list

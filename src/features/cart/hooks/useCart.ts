@@ -5,9 +5,85 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react"
 import { toast } from "sonner"
-import { AddItemToCartRequest, Cart } from "../types/cart"
+import { AddItemToCartRequest, Cart, CartSummary } from "../types/cart"
 import { cartService } from "../services/services-cart"
 import { Product } from "@/features/productos/types/products"
+
+// ✅ Defaults completos según tu CartSummary
+const DEFAULT_SUMMARY: CartSummary = {
+  subtotal: 0,
+  discount: 0,
+  tax: 0,
+  total: 0,
+  currency: "USD",
+  invalidItemsCount: 0,
+  subTotal: 0,     // backend duplica con casing distinto
+  grandTotal: 0,   // backend duplica total
+}
+
+// ✅ Normaliza cualquier objeto "parecido" a CartSummary
+function normalizeSummary(input: any): CartSummary {
+  const subTotalRaw = Number(
+    input?.subTotal ?? input?.subtotal ?? DEFAULT_SUMMARY.subTotal
+  )
+
+  const discount = Number(input?.discount ?? DEFAULT_SUMMARY.discount)
+  const tax = Number(input?.tax ?? DEFAULT_SUMMARY.tax)
+
+  // total: preferimos total → grandTotal → subtotal - discount + tax
+  const totalRaw = Number(
+    input?.total ??
+      input?.grandTotal ??
+      (Number.isFinite(subTotalRaw) ? subTotalRaw - discount + tax : DEFAULT_SUMMARY.total)
+  )
+
+  const currency = String(input?.currency ?? DEFAULT_SUMMARY.currency)
+  const invalidItemsCount = Number(
+    input?.invalidItemsCount ?? DEFAULT_SUMMARY.invalidItemsCount
+  )
+
+  const subtotal = Number(
+    input?.subtotal ?? input?.subTotal ?? DEFAULT_SUMMARY.subtotal
+  )
+  const grandTotal = Number(
+    input?.grandTotal ?? input?.total ?? DEFAULT_SUMMARY.grandTotal
+  )
+
+  return {
+    subtotal: Number.isFinite(subtotal) ? subtotal : 0,
+    discount: Number.isFinite(discount) ? discount : 0,
+    tax: Number.isFinite(tax) ? tax : 0,
+    total: Number.isFinite(totalRaw) ? totalRaw : 0,
+    currency,
+    invalidItemsCount: Number.isFinite(invalidItemsCount) ? invalidItemsCount : 0,
+    subTotal: Number.isFinite(subTotalRaw) ? subTotalRaw : 0,
+    grandTotal: Number.isFinite(grandTotal) ? grandTotal : 0,
+  }
+}
+
+// ✅ Fallback Cart que cumple el tipo
+const EMPTY_CART: Cart = {
+  id: "temp",
+  userId: "anonymous",
+  items: [],
+  summary: { ...DEFAULT_SUMMARY },
+}
+
+function normalizeCart(data: any): Cart {
+  if (!data || typeof data !== "object") return EMPTY_CART
+
+  const items = Array.isArray(data.items) ? data.items : []
+
+  const summary: CartSummary = normalizeSummary(data.summary ?? {})
+
+  return {
+    ...data,
+    id: data.id ?? "temp",
+    userId: data.userId ?? "anonymous",
+    items,
+    summary,
+  } as Cart
+}
 
 export const useCart = () => {
   const [cart, setCart] = useState<Cart | null>(null)
@@ -28,14 +104,12 @@ export const useCart = () => {
       setError(null)
 
       const response = await cartService.getCurrentCart()
-
-      // Adaptar respuesta según API (puede venir en .data o plano)
-      const cartData: Cart | null =
+      const raw =
         response && typeof response === "object" && "data" in response
-          ? (response.data as Cart)
-          : (response as Cart)
+          ? (response as any).data
+          : response
 
-      setCart(cartData ?? { items: [], summary: { total: 0, subtotal: 0 } } as Cart)
+      setCart(raw ? normalizeCart(raw) : EMPTY_CART)
     } catch (err) {
       handleError(err, "Error al cargar el carrito")
     } finally {
@@ -50,7 +124,6 @@ export const useCart = () => {
         setIsLoading(true)
         setError(null)
 
-        // Normalizar cantidad mínima
         const quantity = Math.max(1, Math.floor(Number(data.quantity ?? 1)))
         await cartService.addItem({ ...data, quantity })
 
@@ -87,7 +160,6 @@ export const useCart = () => {
 
         const normalized = Math.floor(Number(quantity))
         if (normalized <= 0) {
-          // Si piden 0 o menos, eliminar el ítem
           await cartService.removeItem(itemId)
         } else {
           await cartService.updateItemQuantity(itemId, { quantity: normalized })
@@ -131,7 +203,7 @@ export const useCart = () => {
       setError(null)
 
       await cartService.clearCart()
-      setCart({ items: [], summary: { total: 0, subtotal: 0 } } as Cart)
+      setCart(EMPTY_CART)
 
       toast.success("Se vació el carrito")
     } catch (err) {
@@ -148,12 +220,12 @@ export const useCart = () => {
       setError(null)
 
       const response = await cartService.refreshCart()
-      const cartData: Cart =
+      const raw =
         response && typeof response === "object" && "data" in response
-          ? (response.data as Cart)
-          : (response as Cart)
+          ? (response as any).data
+          : response
 
-      setCart(cartData)
+      setCart(normalizeCart(raw))
       toast.success("Precios y stock actualizados")
     } catch (err) {
       handleError(err, "Error al actualizar el carrito")
@@ -169,12 +241,12 @@ export const useCart = () => {
       setError(null)
 
       const response = await cartService.mergeCarts()
-      const cartData: Cart =
+      const raw =
         response && typeof response === "object" && "data" in response
-          ? (response.data as Cart)
-          : (response as Cart)
+          ? (response as any).data
+          : response
 
-      setCart(cartData)
+      setCart(normalizeCart(raw))
       toast.success("Carritos fusionados")
     } catch (err) {
       handleError(err, "Error al fusionar carritos")
@@ -190,7 +262,6 @@ export const useCart = () => {
       setError(null)
 
       const result = await cartService.validateCartForCheckout()
-
       if (!result?.valid && result?.errors?.length) {
         toast.error(`Carrito no válido: ${result.errors.join(", ")}`)
       }
@@ -210,16 +281,15 @@ export const useCart = () => {
 
   // ---- Derivados
   const itemCount = useMemo(() => {
-    // suma de cantidades (no cantidad de líneas)
-    const qty =
-      cart?.items?.reduce((acc, it: any) => acc + Number(it?.quantity || 0), 0) || 0
-    return qty
+    return cart?.items?.reduce((acc: number, it: any) => acc + Number(it?.quantity || 0), 0) || 0
   }, [cart?.items])
 
+  // Preferí `total` si viene, si no `grandTotal`; si no, `subtotal/subTotal`
   const total = useMemo(() => {
-    // prioriza total, si no, usa subtotal
-    return Number(cart?.summary?.total ?? cart?.summary?.subtotal ?? 0)
-  }, [cart?.summary?.total, cart?.summary?.subtotal])
+    const s = cart?.summary
+    if (!s) return 0
+    return Number(s.total ?? s.grandTotal ?? s.subtotal ?? s.subTotal ?? 0)
+  }, [cart?.summary])
 
   const isEmpty = useMemo(() => itemCount === 0, [itemCount])
 
@@ -230,14 +300,14 @@ export const useCart = () => {
     error,
 
     // Computados
-    itemCount, // suma de cantidades
+    itemCount,
     total,
     isEmpty,
 
     // Acciones
-    addItem,            // recibe { productId, quantity, ... }
-    addProduct,         // recibe (product, qty)
-    updateQuantity,     // cambia cantidad / elimina si qty<=0
+    addItem,
+    addProduct,
+    updateQuantity,
     removeItem,
     clearCart,
     refreshCart,

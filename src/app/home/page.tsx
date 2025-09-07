@@ -19,6 +19,7 @@ const PageHome = () => {
     selectedModels: [],
     selectedEngines: [],
     yearRange: { min: 1990, max: new Date().getFullYear() },
+    priceRange: { min: 0, max: 9999999 }, 
     categoryId: null,
   })
   const [sortBy, setSortBy] = useState<"name" | "price" | "brand" | "year">("name")
@@ -109,6 +110,7 @@ const PageHome = () => {
       selectedModels: [],
       selectedEngines: [],
       yearRange: { min: 1990, max: new Date().getFullYear() },
+      priceRange: { min: 0, max: 9999999 }, 
       categoryId: null,
     })
   }
@@ -168,7 +170,6 @@ const PageHome = () => {
             <p className="text-red-500">{error}</p>
           ) : (
             <ProductCardsList
-              products={products}
               filters={filters}
               sortBy={sortBy}
               sortOrder={sortOrder}

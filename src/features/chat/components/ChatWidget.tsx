@@ -30,14 +30,12 @@ export default function ChatWidget({
   const [messages, setMessages] = useState<Msg[]>([])
   const viewportRef = useRef<HTMLDivElement>(null)
 
-  // Detectar URL del backend
+  // Detectar URL del backend (Next.js reemplaza process.env.* en build)
   const baseUrl = useMemo(() => {
-    const vite = (import.meta as any)?.env?.VITE_API_URL
-    const next = process?.env?.NEXT_PUBLIC_API_URL
-    return apiUrl || vite || next || ""
+    return apiUrl ?? (process.env.NEXT_PUBLIC_API_URL as string | undefined) ?? ""
   }, [apiUrl])
 
-  // Cargar historial
+  // Cargar historial (solo en cliente)
   useEffect(() => {
     try {
       const raw = localStorage.getItem(LS_KEY)
@@ -96,7 +94,10 @@ export default function ChatWidget({
     })()
 
     try {
-      const res = await fetch(`${baseUrl}/chat`, {
+      const url = `${baseUrl}/chat`
+      if (!baseUrl) throw new Error("Falta configurar NEXT_PUBLIC_API_URL o pasar apiUrl")
+
+      const res = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -109,7 +110,7 @@ export default function ChatWidget({
       const data = await res.json()
       const reply = data?.reply ?? "No obtuve respuesta."
       setMessages((m) => [...m, { role: "bot", text: reply, ts: Date.now() }])
-    } catch (e: any) {
+    } catch (err: any) {
       setError("Ups, hubo un error al enviar tu mensaje.")
       setMessages((m) => [
         ...m,

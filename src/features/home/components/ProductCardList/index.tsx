@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // components/ProductCardsList.tsx - VERSIÓN CON FAVORITOS INTEGRADOS (CORREGIDA)
 import React, { useState, useMemo } from "react"
 import {
@@ -10,9 +12,9 @@ import {
   Cog,
   Loader2,
 } from "lucide-react"
-import { Product } from "../../types/products" // 👈 named import corregido
+import { Product } from "../../types/products" // tipo que usa tu modal/handlers
 import ProductDetailModal from "../ProductDetailModal"
-import { FilterState } from "../../types/filters"
+import { FilterState, ProductResponse } from "../../types/filters" // 👈 importo ProductResponse también
 import useProductsFiltered from "../../hooks/useFilters"
 
 import Image from "next/image"
@@ -24,6 +26,14 @@ interface ProductCardsListProps {
   sortBy?: "name" | "price" | "brand" | "year"
   sortOrder?: "asc" | "desc"
   className?: string
+}
+
+// 🔧 Adaptador: asegura que year sea string y shape de Product
+const toProduct = (p: Product | ProductResponse): Product => {
+  return {
+    ...(p as any),
+    year: String((p as any)?.year ?? ""),
+  } as Product
 }
 
 const ProductCardsList: React.FC<ProductCardsListProps> = ({
@@ -48,15 +58,18 @@ const ProductCardsList: React.FC<ProductCardsListProps> = ({
 
   // Filtros por defecto
   const defaultFilters: FilterState = {
-    priceRange: { min: 0, max: Infinity },
     selectedBrands: [],
+    selectedModels: [],
+    selectedEngines: [],
     yearRange: { min: 1990, max: new Date().getFullYear() },
+    priceRange: { min: 0, max: 9999999 },
+    categoryId: null,
   }
   const filters = externalFilters || defaultFilters
 
   // Productos filtrados
   const {
-    products: allProducts,
+    products: allProducts, // ProductResponse[]
     loading,
     error,
     totalCount,
@@ -80,18 +93,19 @@ const ProductCardsList: React.FC<ProductCardsListProps> = ({
     ]
     return allProducts
       .filter((p) => !productsToHide.includes(p.name))
-      .filter((p) => p.stock > 0)
+      .filter((p) => (typeof p.stock === "number" ? p.stock > 0 : true))
   }, [allProducts])
 
   // Favoritos
-  const handleToggleFavorite = async (product: Product) => {
-    if (!product.id) return
-    await toggleFavorite(product.id)
+  const handleToggleFavorite = async (product: Product | ProductResponse) => {
+    const p = toProduct(product)
+    if (!p.id) return
+    await toggleFavorite(p.id)
   }
 
   const handleToggleFavoriteWithEvent = async (
     e: React.MouseEvent,
-    product: Product
+    product: Product | ProductResponse
   ) => {
     e.preventDefault()
     e.stopPropagation()
@@ -99,25 +113,27 @@ const ProductCardsList: React.FC<ProductCardsListProps> = ({
   }
 
   // Carrito (acepta qty; el modal puede mandar cantidad)
-  const handleAddToCart = async (product: Product, quantity: number = 1) => {
-    if (!product?.id || product.stock <= 0) return
+  const handleAddToCart = async (product: Product | ProductResponse, quantity: number = 1) => {
+    const p = toProduct(product)
+  
+    if (!p?.id || (typeof (product as any).stock === "number" && (product as any).stock <= 0)) return
     await addItem({
-      productId: product.id,
+      productId: p.id,
       quantity: Math.max(1, Math.floor(quantity)),
     })
   }
 
   const handleAddToCartWithEvent = async (
     e: React.MouseEvent,
-    product: Product
+    product: Product | ProductResponse
   ) => {
     e.preventDefault()
     e.stopPropagation()
     await handleAddToCart(product, 1)
   }
 
-  const handleProductClick = (product: Product) => {
-    setSelectedProduct(product)
+  const handleProductClick = (product: Product | ProductResponse) => {
+    setSelectedProduct(toProduct(product))
     setShowProductDetail(true)
   }
 
@@ -182,19 +198,6 @@ const ProductCardsList: React.FC<ProductCardsListProps> = ({
             {totalCount > products.length && ` de ${totalCount} total`}
           </p>
         </div>
-      {/*
-        <div className="flex gap-4">
-          <div className="text-center">
-            <p className="text-sm text-gray-500">Favoritos</p>
-            <p className="text-xl font-bold text-red-500">
-              {favoriteIds?.length ?? 0}
-            </p>
-          </div>
-          <div className="text-center">
-            <p className="text-sm text-gray-500">En carrito</p>
-            <p className="text-xl font-bold text-blue-500">{itemCount}</p>
-          </div>
-        </div>*/}
       </div>
 
       {/* Grid */}
@@ -202,7 +205,8 @@ const ProductCardsList: React.FC<ProductCardsListProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {products.map((product, index) => {
             const isProductFavorite = isFavorite(product.id)
-            const isOutOfStock = product.stock <= 0
+            const isOutOfStock =
+              typeof product.stock === "number" ? product.stock <= 0 : false
 
             return (
               <div
@@ -220,7 +224,7 @@ const ProductCardsList: React.FC<ProductCardsListProps> = ({
                   />
 
                   {/* Badge de stock (opcional) */}
-                  {/* <div className="absolute top-4 left-4">{getStockBadge(product.stock)}</div> */}
+                  {/* <div className="absolute top-4 left-4">{getStockBadge(Number(product.stock ?? 0))}</div> */}
 
                   {/* Favorito */}
                   <button
@@ -276,7 +280,7 @@ const ProductCardsList: React.FC<ProductCardsListProps> = ({
                   <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
                     <div className="flex items-center gap-1">
                       <Calendar size={14} />
-                      <span>{product.year}</span>
+                      <span>{String(product.year)}</span>
                     </div>
                     {product.model && (
                       <div className="flex items-center gap-1">
@@ -299,7 +303,7 @@ const ProductCardsList: React.FC<ProductCardsListProps> = ({
                     </p>
                   )}
 
-                  {/* Botón agregar al carrito (opcional; lo dejamos comentado si sólo agregas desde el modal) */}
+                  {/* Botón agregar al carrito (opcional) */}
                   {/*
                   <button
                     onClick={(e) => handleAddToCartWithEvent(e, product)}
