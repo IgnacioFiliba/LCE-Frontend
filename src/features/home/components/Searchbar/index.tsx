@@ -164,7 +164,7 @@ const SearchBarWithAPI: React.FC<SearchBarWithAPIProps> = ({
         </button> */}
       </div>
 
-      {/* Estado de búsqueda */}
+      {/* Estado de búsqueda 
       {searchTerm && (
         <div className="mb-4">
           {loading && (
@@ -196,7 +196,7 @@ const SearchBarWithAPI: React.FC<SearchBarWithAPIProps> = ({
             <div className="text-red-600 text-sm">❌ Error: {error}</div>
           )}
         </div>
-      )}
+      )} */}
     </div>
   )
 }

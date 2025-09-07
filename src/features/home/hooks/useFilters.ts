@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// hooks/useProductsFiltered.ts
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from "react";
@@ -50,36 +49,45 @@ const useProductsFiltered = ({
   const [error, setError] = useState<string | null>(null);
   const [totalCount, setTotalCount] = useState(0);
 
+  const trimmedSearch = (searchTerm ?? "").trim();
+  const isSearchActive = trimmedSearch.length > 0;
+
   // ------- Build API params from FilterState -------
   const apiParams: ProductQueryParams & {
     brands?: string[];
     models?: string[];
     engines?: string[];
     categoryId?: string | null;
+    // extras que soporta tu service
+    sortBy?: "name" | "price" | "year" | "brand" | "model" | "engine" | "stock";
+    sortOrder?: "asc" | "desc";
   } = useMemo(() => {
     const currentYear = new Date().getFullYear();
 
     const params: any = {
       limit,
       page,
-      search: searchTerm.trim() || undefined,
+      search: isSearchActive ? trimmedSearch : undefined, // 👈 activa búsqueda
       sortBy,
       sortOrder,
     };
 
-    // Year filters
-    if (filters.yearRange?.min && filters.yearRange.min > 0) {
-      params.yearMin = filters.yearRange.min;
-    }
-    if (
-      filters.yearRange?.max &&
-      filters.yearRange.max > 0 &&
-      filters.yearRange.max <= currentYear
-    ) {
-      params.yearMax = filters.yearRange.max;
+    // ⚠️ Importante: NO enviar yearMin / yearMax cuando hay búsqueda activa
+    // porque muchos productos no tienen "year" y el backend los excluye.
+    if (!isSearchActive) {
+      if (filters.yearRange?.min && filters.yearRange.min > 0) {
+        params.yearMin = filters.yearRange.min;
+      }
+      if (
+        filters.yearRange?.max &&
+        filters.yearRange.max > 0 &&
+        filters.yearRange.max <= currentYear
+      ) {
+        params.yearMax = filters.yearRange.max;
+      }
     }
 
-    // Brand/Model/Engine as arrays
+    // Brand/Model/Engine como arrays
     if (filters.selectedBrands?.length) {
       params.brands = filters.selectedBrands;
     }
@@ -95,8 +103,11 @@ const useProductsFiltered = ({
       params.categoryId = filters.categoryId;
     }
 
+    if (typeof window !== "undefined") {
+      console.log("🔧 [useProductsFiltered] apiParams:", params);
+    }
     return params;
-  }, [searchTerm, filters, sortBy, sortOrder, page, limit]);
+  }, [limit, page, trimmedSearch, isSearchActive, filters, sortBy, sortOrder]);
 
   // ------- Fetch products -------
   const fetchProducts = useCallback(async () => {
@@ -106,7 +117,7 @@ const useProductsFiltered = ({
 
       const data = await filtersService.getProductsWithSort(apiParams);
 
-      // Optional: hide seeder items
+      // Optional: esconder algunos seeds
       const HIDE = new Set<string>([
         "Aceite Castrol 10W40",
         "Amortiguador Monroe",
@@ -134,7 +145,7 @@ const useProductsFiltered = ({
     }
   }, [apiParams]);
 
-  // ------- Fetch facets -------
+  // ------- Fetch facets (una sola vez) -------
   const fetchFacets = useCallback(async () => {
     try {
       const facets = await filtersService.getFacets();
@@ -186,8 +197,8 @@ const useProductsFiltered = ({
 
   const refetch = useCallback(() => {
     fetchProducts();
-    fetchFacets();
-  }, [fetchProducts, fetchFacets]);
+    // fetchFacets(); // normalmente no hace falta refetchear facets en cada refetch
+  }, [fetchProducts]);
 
   return {
     products,

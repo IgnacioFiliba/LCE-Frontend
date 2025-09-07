@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-// components/ProductCardsList.tsx - VERSIÓN CON FAVORITOS INTEGRADOS (CORREGIDA)
+// components/ProductCardsList.tsx - VERSIÓN QUE USA LA PROP `products` (SIN FETCH INTERNO)
 import React, { useState, useMemo } from "react"
 import {
   Filter,
@@ -12,23 +12,25 @@ import {
   Cog,
   Loader2,
 } from "lucide-react"
-import { Product } from "../../types/products" // tipo que usa tu modal/handlers
-import ProductDetailModal from "../ProductDetailModal"
-import { FilterState, ProductResponse } from "../../types/filters" // 👈 importo ProductResponse también
-import useProductsFiltered from "../../hooks/useFilters"
-
 import Image from "next/image"
+
+import { Product } from "../../types/products"
+import { FilterState, ProductResponse } from "../../types/filters"
+import ProductDetailModal from "../ProductDetailModal"
+
 import { useCartContext } from "../../../cart/context"
 import { useFavorites } from "@/features/cart/hooks/useFavorites"
 
 interface ProductCardsListProps {
+  products: ProductResponse[]
+  searchTerm: string
   filters?: FilterState
   sortBy?: "name" | "price" | "brand" | "year"
   sortOrder?: "asc" | "desc"
   className?: string
 }
 
-// 🔧 Adaptador: asegura que year sea string y shape de Product
+// 🔧 Adaptador: asegura que year sea string y shape de Product para el modal
 const toProduct = (p: Product | ProductResponse): Product => {
   return {
     ...(p as any),
@@ -37,64 +39,72 @@ const toProduct = (p: Product | ProductResponse): Product => {
 }
 
 const ProductCardsList: React.FC<ProductCardsListProps> = ({
+  products: incomingProducts = [],
+  searchTerm,
   filters: externalFilters,
-  sortBy: externalSortBy = "name",
-  sortOrder: externalSortOrder = "asc",
+  sortBy = "name",
+  sortOrder = "asc",
   className = "",
 }) => {
   // Favoritos desde backend
-  const {
-    toggleFavorite,
-    isFavorite,
-    favoriteIds,
-    isLoading: favoritesLoading,
-  } = useFavorites()
+  const { toggleFavorite, isFavorite, isLoading: favoritesLoading } = useFavorites()
 
   // Carrito
-  const { addItem, isLoading: cartLoading, itemCount } = useCartContext()
+  const { addItem, isLoading: cartLoading } = useCartContext()
 
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [showProductDetail, setShowProductDetail] = useState(false)
 
-  // Filtros por defecto
-  const defaultFilters: FilterState = {
-    selectedBrands: [],
-    selectedModels: [],
-    selectedEngines: [],
-    yearRange: { min: 1990, max: new Date().getFullYear() },
-    priceRange: { min: 0, max: 9999999 },
-    categoryId: null,
-  }
-  const filters = externalFilters || defaultFilters
-
-  // Productos filtrados
-  const {
-    products: allProducts, // ProductResponse[]
-    loading,
-    error,
-    totalCount,
-    refetch,
-  } = useProductsFiltered({
-    searchTerm: "",
-    filters,
-    sortBy: externalSortBy,
-    sortOrder: externalSortOrder,
-    page: 1,
-    limit: 100,
-  })
-
-  // Ocultar algunos + dejar solo con stock
+  // Aplicar ocultos/stock/sort local sobre LO QUE LLEGA POR PROP
   const products = useMemo(() => {
-    const productsToHide = [
+    const HIDE = new Set<string>([
       "Aceite Castrol 10W40",
       "Amortiguador Monroe",
       "Bujía NGK Iridium",
       "Filtro de Aceite Bosch",
-    ]
-    return allProducts
-      .filter((p) => !productsToHide.includes(p.name))
+    ])
+
+    const base = Array.isArray(incomingProducts) ? incomingProducts : []
+
+    // filtrar ocultos + stock > 0 (si stock viene definido)
+    let arr = base
+      .filter((p) => !HIDE.has(p.name))
       .filter((p) => (typeof p.stock === "number" ? p.stock > 0 : true))
-  }, [allProducts])
+
+    // sort opcional local (por si querés reforzar el orden)
+    const getVal = (p: any) => {
+      switch (sortBy) {
+        case "name":
+          return (p.name || "").toString().toLowerCase()
+        case "price":
+          return Number(p.price) || 0
+        case "brand":
+          return (p.brand || "").toString().toLowerCase()
+        case "year":
+          return Number(p.year) || 0
+        default:
+          return 0
+      }
+    }
+
+    arr = [...arr].sort((a, b) => {
+      const A = getVal(a)
+      const B = getVal(b)
+      if (A < B) return sortOrder === "asc" ? -1 : 1
+      if (A > B) return sortOrder === "asc" ? 1 : -1
+      return 0
+    })
+
+    if (typeof window !== "undefined") {
+      console.log(
+        "[ProductCardsList] rendering",
+        arr.length,
+        "items for search:",
+        searchTerm
+      )
+    }
+    return arr
+  }, [incomingProducts, sortBy, sortOrder, searchTerm])
 
   // Favoritos
   const handleToggleFavorite = async (product: Product | ProductResponse) => {
@@ -113,9 +123,11 @@ const ProductCardsList: React.FC<ProductCardsListProps> = ({
   }
 
   // Carrito (acepta qty; el modal puede mandar cantidad)
-  const handleAddToCart = async (product: Product | ProductResponse, quantity: number = 1) => {
+  const handleAddToCart = async (
+    product: Product | ProductResponse,
+    quantity: number = 1
+  ) => {
     const p = toProduct(product)
-  
     if (!p?.id || (typeof (product as any).stock === "number" && (product as any).stock <= 0)) return
     await addItem({
       productId: p.id,
@@ -158,59 +170,27 @@ const ProductCardsList: React.FC<ProductCardsListProps> = ({
     )
   }
 
-  // Estados base
-  if (loading) {
-    return (
-      <div className={`${className} flex justify-center items-center h-64`}>
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500" />
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className={`${className} bg-red-50 border border-red-200 rounded-xl p-6 text-center`}>
-        <Filter size={48} className="mx-auto mb-2 text-red-600" />
-        <h3 className="text-lg font-semibold text-red-800 mb-2">
-          Error al cargar productos
-        </h3>
-        <p className="text-red-600">{error}</p>
-        <button
-          onClick={refetch}
-          className="mt-4 px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-        >
-          Reintentar
-        </button>
-      </div>
-    )
-  }
-
   return (
     <div className={className}>
       {/* Header con stats */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Productos Disponibles
-          </h2>
-          <p className="text-gray-600">
-            Mostrando {products.length} productos
-            {totalCount > products.length && ` de ${totalCount} total`}
-          </p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Productos Disponibles</h2>
+          <p className="text-gray-600">Mostrando {products.length} productos</p>
         </div>
       </div>
 
       {/* Grid */}
       {products.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {products.map((product, index) => {
+          {products.map((product) => {
             const isProductFavorite = isFavorite(product.id)
             const isOutOfStock =
               typeof product.stock === "number" ? product.stock <= 0 : false
 
             return (
               <div
-                key={`${product.id}-${index}`}
+                key={product.id}
                 className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden cursor-pointer border border-gray-100"
                 onClick={() => handleProductClick(product)}
               >
@@ -304,7 +284,7 @@ const ProductCardsList: React.FC<ProductCardsListProps> = ({
                   )}
 
                   {/* Botón agregar al carrito (opcional) */}
-                  {/*
+                  {/* 
                   <button
                     onClick={(e) => handleAddToCartWithEvent(e, product)}
                     disabled={isOutOfStock || cartLoading}
@@ -354,12 +334,7 @@ const ProductCardsList: React.FC<ProductCardsListProps> = ({
             Intenta ajustando los filtros para ver más productos disponibles en
             nuestro catálogo
           </p>
-          <button
-            onClick={refetch}
-            className="px-8 py-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors font-semibold"
-          >
-            Recargar productos
-          </button>
+          {/* Este botón ya no hace refetch aquí porque los datos los provee el padre */}
         </div>
       )}
 
@@ -368,7 +343,7 @@ const ProductCardsList: React.FC<ProductCardsListProps> = ({
         isOpen={showProductDetail}
         product={selectedProduct}
         onClose={() => setShowProductDetail(false)}
-        onAddToCart={handleAddToCart} // 👈 acepta (product, qty)
+        onAddToCart={handleAddToCart}
       />
     </div>
   )
