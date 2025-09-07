@@ -245,7 +245,7 @@ const Navbar = () => {
         {/* LOGO ultra animado */}
         <motion.div
           variants={logoVariants}
-          whileHover="hover"
+          whileHover=""
         >
           <Link
             href="/home"
@@ -259,6 +259,7 @@ const Navbar = () => {
               }}
               transition={{ duration: 2, repeat: Infinity }}
             />
+            
             <motion.span
               className="relative z-10 text-2xl md:text-3xl font-bold bg-gradient-to-r from-white via-red-200 to-white bg-clip-text text-transparent"
               whileHover={{
@@ -266,7 +267,7 @@ const Navbar = () => {
                 backgroundPosition: "100% 0%",
               }}
             >
-              RepuStore
+              La Casa del Embrague
             </motion.span>
             {/* Efectos de chispas */}
             <motion.div
@@ -274,10 +275,7 @@ const Navbar = () => {
               animate={{ rotate: 360 }}
               transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
             >
-              <Star
-                className="w-4 h-4 text-yellow-400"
-                fill="currentColor"
-              />
+              
             </motion.div>
           </Link>
         </motion.div>
@@ -484,9 +482,9 @@ const Navbar = () => {
                 className="relative group"
               >
                 <motion.div
-                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold border-2 border-blue-500 hover:border-blue-400 transition-all duration-300 shadow-lg"
+                  className="px-4 py-2 rounded-xl bg-black text-white font-bold border-2 border-neutral-700 hover:border-neutral-500 transition-all duration-300 shadow-lg"
                   whileHover={{
-                    boxShadow: "0 0 25px rgba(59,130,246,0.6)",
+                    boxShadow: "0 0 25px rgba(246, 59, 59, 0.6)",
                   }}
                 >
                   <motion.span

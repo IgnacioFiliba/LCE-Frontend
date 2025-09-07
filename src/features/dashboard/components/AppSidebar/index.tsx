@@ -59,7 +59,7 @@ export function AppSidebar() {
                   <ShoppingBag className="size-4" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="font-semibold">RepuStore</span>
+                  <span className="font-semibold">LCE</span>
                   <span className="text-xs">Admin Panel</span>
                 </div>
               </Link>

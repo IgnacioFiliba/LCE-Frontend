@@ -132,7 +132,7 @@ const RepuStoreFooter = () => {
                   <Car className="w-8 h-8 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-white">RepuStore</h2>
+                  <h2 className="text-2xl font-bold text-white">LaCasaDelEmbrague</h2>
                   <p className="text-gray-400 text-sm">Repuestos para Autos</p>
                 </div>
               </div>
@@ -144,18 +144,18 @@ const RepuStoreFooter = () => {
               <div className="space-y-3">
                 <div className="flex items-center gap-3 text-gray-300">
                   <Phone className="w-5 h-5 text-red-500" />
-                  <span>+57 (6) 123-4567</span>
+                  <span>+54 (9) 656-9651</span>
                 </div>
                 <div className="flex items-center gap-3 text-gray-300">
                   <Mail className="w-5 h-5 text-red-500" />
-                  <span>info@repustore.com</span>
+                  <span>lcembragues@gmail.com</span>
                 </div>
                 <div className="flex items-start gap-3 text-gray-300">
                   <MapPin className="w-5 h-5 text-red-500 mt-1" />
                   <span>
-                    Carrera 23 #45-67
+                    Av. Revolución de Mayo 1594, X5000
                     <br />
-                    Manizales, Caldas
+                     Córdoba, Córdoba, Argentina
                   </span>
                 </div>
                 <div className="flex items-center gap-3 text-gray-300">
@@ -246,8 +246,8 @@ const RepuStoreFooter = () => {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-center md:text-left">
-              <p className="text-gray-400 text-sm">© 2025 RepuStore. Todos los derechos reservados.</p>
-              <p className="text-gray-500 text-xs mt-1">Desarrollado con ❤️ en Manizales, Colombia</p>
+              <p className="text-gray-400 text-sm">© 2025 La Casa del Embrague SRL. Todos los derechos reservados.</p>
+              <p className="text-gray-500 text-xs mt-1">Desarrollado con ❤️ en Cordoba, Argentina</p>
             </div>
 
             <div className="flex flex-wrap justify-center gap-6 text-sm">
