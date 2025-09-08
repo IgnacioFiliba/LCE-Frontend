@@ -15,7 +15,7 @@ const DEFAULT_SUMMARY: CartSummary = {
   discount: 0,
   tax: 0,
   total: 0,
-  currency: "USD",
+  currency: "ARS",
   invalidItemsCount: 0,
   subTotal: 0,     // backend duplica con casing distinto
   grandTotal: 0,   // backend duplica total

@@ -26,7 +26,7 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ isOpen, onClose, or
     return statusMap[backendStatus] || backendStatus || "En Preparación";
   };
 
-  const formatPrice = (price: number | string, currency = "USD") => {
+  const formatPrice = (price: number | string, currency = "ARS") => {
     const n = typeof price === "string" ? parseFloat(price) : price;
     return new Intl.NumberFormat("es-ES", {
       style: "currency",

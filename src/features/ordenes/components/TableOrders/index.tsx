@@ -172,8 +172,8 @@ const OrdersTable: React.FC = () => {
   }
 
   // formatos
-  const formatPrice = (price: number, currency: string = "COP"): string =>
-    new Intl.NumberFormat("es-CO", {
+  const formatPrice = (price: number, currency: string = "ARS"): string =>
+    new Intl.NumberFormat("es-AR", {
       style: "currency",
       currency,
       minimumFractionDigits: 0,
@@ -185,14 +185,14 @@ const OrdersTable: React.FC = () => {
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString)
     const day = date.getDate()
-    const month = date.toLocaleDateString("es-CO", { month: "short" })
+    const month = date.toLocaleDateString("es-AR", { month: "short" })
     const year = date.getFullYear()
     return `${day} de ${month} de ${year}`
   }
 
   const formatTime = (dateString: string): string =>
     new Date(dateString)
-      .toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit", hour12: true })
+      .toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hour12: true })
       .replace(/\s/g, " ")
 
   // UI error
@@ -402,7 +402,7 @@ const OrdersTable: React.FC = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center text-sm font-medium text-gray-900">
                           <DollarSign className="h-4 w-4 text-green-500 mr-1" />
-                          {formatPrice(parseFloat(order.orderDetails?.price || "0"), "COP")}
+                          {formatPrice(parseFloat(order.orderDetails?.price || "0"), "ARS")}
                         </div>
                       </td>
 
