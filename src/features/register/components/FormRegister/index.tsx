@@ -81,11 +81,26 @@ const validationSchema = Yup.object({
     .required("Confirma tu contraseña"),
 
   phone: Yup.string()
-    .matches(
-      /^\+\d{10,15}$/,
-      "Debe ser un número de teléfono válido con código de país (+573001234567)"
-    )
-    .required("El teléfono es obligatorio"),
+  .transform((v) => (v ? v.replace(/[^\d+]/g, "") : v)) // deja solo + y dígitos
+  .test(
+    "is-argentina-phone",
+    "Ingresá un teléfono argentino válido (10 dígitos; opcional 0, +54/+549 o 15)",
+    (v) => {
+      if (!v) return false;
+
+      // Internacional (opcional 9 para móviles): +54[9]<10 dígitos>
+      const intl = /^\+54(?:9?\d{10})$/.test(v);
+
+      // Local estándar: 10 dígitos (área+abonado), opcional prefijo 0
+      const local = /^(?:0?\d{10})$/.test(v.replace(/^\+/, "")); // por si alguien pega un '+' suelto
+
+      // Legacy móvil local con "15" (0? + área 2-4 dígitos + 15 + abonado 6-8 dígitos)
+      const legacyMobile = /^0?\d{2,4}15\d{6,8}$/.test(v);
+
+      return intl || local || legacyMobile;
+    }
+  )
+  .required("El teléfono es obligatorio"),
 
   age: Yup.number()
     .min(18, "Debe ser mayor de 18 años")
@@ -261,7 +276,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               </div>
             </div>
             <CardTitle className="text-4xl font-black tracking-tight bg-gradient-to-r from-black via-red-600 to-black bg-clip-text text-transparent">
-              AutoParts
+              LCE
             </CardTitle>
           </div>
           <CardDescription className="text-gray-600 font-medium text-lg">
@@ -691,7 +706,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                     </div>
                   </div>
 
-                  {/* Checkbox para admin */}
+                  {/* Checkbox para admin
                   <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
                     <div className="flex items-start gap-3">
                       <input
@@ -718,7 +733,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                         </p>
                       </div>
                     </div>
-                  </div>
+                  </div>  */}
                 </div>
 
                 {/* Botón premium */}

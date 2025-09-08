@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: "https://pf-grupo5-8.onrender.com/api/:path*", // ← AGREGAR /api
+        destination: "https://lce-backend-y3dp.onrender.com/api/:path*", // ← AGREGAR /api
       },
     ]
   },

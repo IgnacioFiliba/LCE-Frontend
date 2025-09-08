@@ -15,7 +15,7 @@ import {
 } from "../types/table-users"
 
 // Configuración base de la API
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://pf-grupo5-8.onrender.com"
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://lce-backend-y3dp.onrender.com"
 
 class ApiClient {
   private baseURL: string

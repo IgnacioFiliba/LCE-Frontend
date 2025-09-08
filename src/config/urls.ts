@@ -32,8 +32,8 @@ const getURLConfig = (): URLConfig => {
     // ✅ PRODUCCIÓN - URLs deployed
     return {
       API_URL:
-        process.env.NEXT_PUBLIC_API_URL || "https://pf-grupo5-8.onrender.com",
-      BASE_URL: process.env.NEXT_PUBLIC_BASE_URL || "https://pf-05.vercel.app/",
+        process.env.NEXT_PUBLIC_API_URL || "https://lce-backend-y3dp.onrender.com",
+      BASE_URL: process.env.NEXT_PUBLIC_BASE_URL || "https://lce-frontend.vercel.app/",
       isDevelopment: false,
       isProduction: true,
     }

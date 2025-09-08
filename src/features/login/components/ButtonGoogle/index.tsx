@@ -49,7 +49,7 @@ const ButtonGoogle = () => {
       const googleClientId =
         "906975497977-j0vr60a3ijerhahsnnpsshdnaujj5et5.apps.googleusercontent.com"
       const redirectUri =
-        "https://pf-grupo5-8.onrender.com/auth/google/redirect"
+        "https://lce-backend-y3dp.onrender.com/auth/google/redirect"
 
       // Construir URL de Google con selección forzada
       const googleAuthUrl = new URL(
