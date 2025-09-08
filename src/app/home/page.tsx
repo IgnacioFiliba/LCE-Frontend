@@ -266,7 +266,7 @@ const PageHome = () => {
                         <ChevronLeft className="h-4 w-4" />
                       </Button>
 
-                      <div className="px-3 py-1 text-sm bg-blue-50 text-blue-600 rounded">
+                      <div className="px-3 py-1 text-sm bg-red-50 text-red-600 rounded">
                         {currentPage}
                       </div>
 

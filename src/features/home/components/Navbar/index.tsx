@@ -455,7 +455,7 @@ const Navbar = () => {
                           setShowUserMenu(false)
                         }}
                       >
-                        <UserCircle className="w-4 h-4 text-blue-500" />
+                        <UserCircle className="w-4 h-4 text-red-500" />
                         <Link href="/profile">
                           <span className="text-sm font-medium">Mi Perfil</span>
                         </Link>
@@ -622,7 +622,7 @@ const Navbar = () => {
                     <Link
                       href="/profile"
                       onClick={() => setOpen(false)}
-                      className="group flex items-center space-x-4 text-white font-medium p-4 rounded-xl hover:bg-gradient-to-r hover:from-blue-600/20 hover:to-blue-700/10 transition-all duration-300 w-full text-left"
+                      className="group flex items-center space-x-4 text-white font-medium p-4 rounded-xl hover:bg-gradient-to-r hover:from-red-600/20 hover:to-red-700/10 transition-all duration-300 w-full text-left"
                     >
                       <motion.span
                         className="text-2xl"
@@ -632,7 +632,7 @@ const Navbar = () => {
                       </motion.span>
                       <span className="text-lg">Mi Perfil</span>
                       <motion.div
-                        className="ml-auto w-2 h-2 bg-blue-500 rounded-full opacity-0 group-hover:opacity-100"
+                        className="ml-auto w-2 h-2 bg-red-500 rounded-full opacity-0 group-hover:opacity-100"
                         whileHover={{ scale: 1.5 }}
                       />
                     </Link>
@@ -678,7 +678,7 @@ const Navbar = () => {
                   <Link
                     href="/"
                     onClick={() => setOpen(false)}
-                    className="group flex items-center space-x-4 text-white font-medium p-4 rounded-xl hover:bg-gradient-to-r hover:from-blue-600/20 hover:to-blue-700/10 transition-all duration-300 w-full text-left"
+                    className="group flex items-center space-x-4 text-white font-medium p-4 rounded-xl hover:bg-gradient-to-r hover:from-red-600/20 hover:to-red-700/10 transition-all duration-300 w-full text-left"
                   >
                     <motion.span
                       className="text-2xl"
@@ -688,7 +688,7 @@ const Navbar = () => {
                     </motion.span>
                     <span className="text-lg">Iniciar Sesión</span>
                     <motion.div
-                      className="ml-auto w-2 h-2 bg-blue-500 rounded-full opacity-0 group-hover:opacity-100"
+                      className="ml-auto w-2 h-2 bg-red-500 rounded-full opacity-0 group-hover:opacity-100"
                       whileHover={{ scale: 1.5 }}
                     />
                   </Link>

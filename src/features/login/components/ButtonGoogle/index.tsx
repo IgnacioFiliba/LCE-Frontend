@@ -111,7 +111,7 @@ const ButtonGoogle = () => {
           className="w-94 h-12 rounded-2xl flex items-center justify-center gap-3 bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? (
-            <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+            <Loader2 className="w-5 h-5 animate-spin text-red-600" />
           ) : (
             <GoogleIcon />
           )}

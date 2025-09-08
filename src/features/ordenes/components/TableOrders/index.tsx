@@ -156,7 +156,7 @@ const OrdersTable: React.FC = () => {
   // badge estado
   const getStatusBadge = (status: OrderStatus): JSX.Element => {
     const statusStyles: Record<OrderStatus, string> = {
-      "En Preparacion": "bg-blue-100 text-blue-800 border-blue-200",
+      "En Preparacion": "bg-red-100 text-red-800 border-red-200",
       Aprobada: "bg-green-100 text-green-800 border-green-200",
       "En Transito": "bg-yellow-100 text-yellow-800 border-yellow-200",
       Entregada: "bg-emerald-100 text-emerald-800 border-emerald-200",
@@ -232,7 +232,7 @@ const OrdersTable: React.FC = () => {
         </div>
         <div className="p-8">
           <div className="flex items-center justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
           </div>
         </div>
       </div>
@@ -268,7 +268,7 @@ const OrdersTable: React.FC = () => {
                 placeholder="Buscar por número de orden, cliente o email..."
                 value={searchTerm}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleSearch(e.target.value)}
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 disabled={loading}
               />
             </div>
@@ -276,7 +276,7 @@ const OrdersTable: React.FC = () => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
-                  className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                  className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
                 >
                   {orderFilter === "all" && (
                     <>
@@ -323,7 +323,7 @@ const OrdersTable: React.FC = () => {
             <button
               onClick={refreshOrders}
               disabled={loading}
-              className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
               Actualizar
@@ -445,7 +445,7 @@ const OrdersTable: React.FC = () => {
 
                         <button
                           onClick={() => handleViewDetails(order)}
-                          className="inline-flex items-center p-2 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ml-2"
+                          className="inline-flex items-center p-2 border border-red-300 rounded text-xs font-medium text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 ml-2"
                           title="Ver detalles de la orden"
                         >
                           <Eye className="h-4 w-4" />
@@ -480,7 +480,7 @@ const OrdersTable: React.FC = () => {
               <button
                 onClick={() => setPage((currentPage || 1) - 1)}
                 disabled={!hasPrevPage || loading}
-                className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Anterior
               </button>
@@ -490,7 +490,7 @@ const OrdersTable: React.FC = () => {
               <button
                 onClick={() => setPage((currentPage || 1) + 1)}
                 disabled={!hasNextPage || loading}
-                className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Siguiente
               </button>

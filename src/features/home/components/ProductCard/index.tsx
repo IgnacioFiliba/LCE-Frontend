@@ -146,7 +146,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       <div className="p-4">
         {/* Marca y Modelo */}
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-semibold text-blue-600 uppercase tracking-wide">
+          <span className="text-sm font-semibold text-red-600 uppercase tracking-wide">
             {product.brand}
           </span>
           <span className="text-xs text-gray-500">{product.model}</span>

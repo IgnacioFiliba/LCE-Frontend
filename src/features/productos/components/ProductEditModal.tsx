@@ -117,7 +117,7 @@ const ProductEditModal: React.FC<Props> = ({ isOpen, product, onClose, onSave })
           <button
             onClick={submit}
             disabled={saving}
-            className="px-4 py-2 rounded bg-blue-600 text-white disabled:opacity-50"
+            className="px-4 py-2 rounded bg-red-600 text-white disabled:opacity-50"
           >
             {saving ? (<><Loader2 className="h-4 w-4 inline animate-spin mr-2" /> Guardando...</>) : "Guardar"}
           </button>

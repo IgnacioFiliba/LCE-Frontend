@@ -64,13 +64,13 @@ const ProductDetailModal: React.FC<Props> = ({ isOpen, onClose, product }) => {
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <div className="bg-red-50 p-4 rounded-lg border border-red-200">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <DollarSign className="h-5 w-5 text-blue-600 mr-2" />
-                      <span className="text-sm font-medium text-blue-900">Precio</span>
+                      <DollarSign className="h-5 w-5 text-red-600 mr-2" />
+                      <span className="text-sm font-medium text-red-900">Precio</span>
                     </div>
-                    <span className="text-lg font-bold text-blue-900">{formatPrice(product.price)}</span>
+                    <span className="text-lg font-bold text-red-900">{formatPrice(product.price)}</span>
                   </div>
                 </div>
 
@@ -166,7 +166,7 @@ const ProductDetailModal: React.FC<Props> = ({ isOpen, onClose, product }) => {
         <div className="flex justify-end p-6 border-t border-gray-200 bg-gray-50">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+            className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
           >
             Cerrar
           </button>

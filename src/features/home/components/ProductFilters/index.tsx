@@ -135,7 +135,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
                       type="button"
                       onClick={() => toggle(opt)}
                       className={`w-full px-3 py-2 text-left text-sm flex items-center justify-between hover:bg-gray-50 ${
-                        isSel ? 'bg-blue-50 text-blue-700' : ''
+                        isSel ? 'bg-red-50 text-red-700' : ''
                       }`}
                     >
                       <span className="truncate">{opt}</span>
@@ -162,7 +162,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="text-xs text-blue-600 hover:text-blue-700"
+              className="text-xs text-red-600 hover:text-red-700"
             >
               Hecho
             </button>
@@ -197,7 +197,7 @@ const SingleSelect: React.FC<SingleSelectProps> = ({
     <select
       value={value ?? ''}
       onChange={(e) => onChange(e.target.value || null)}
-      className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
     >
       <option value="">{placeholder}</option>
       {options.map((o) => (
@@ -273,14 +273,14 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
             onClick={onToggleFilters}
             className={`px-4 py-2 rounded-lg border transition-colors flex items-center gap-2 ${
               showFilters
-                ? 'bg-blue-100 border-blue-300 text-blue-700'
+                ? 'bg-red-100 border-red-300 text-red-700'
                 : 'bg-white border-gray-300 hover:bg-gray-50'
             }`}
           >
             <Filter size={20} />
             Filtros
             {activeCount() > 0 && (
-              <span className="bg-blue-600 text-white text-xs rounded-full px-2 py-1">
+              <span className="bg-red-600 text-white text-xs rounded-full px-2 py-1">
                 {activeCount()}
               </span>
             )}
@@ -299,7 +299,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                 onClick={() => onSortChange(key)}
                 className={`px-3 py-1 rounded-md text-sm font-medium transition-colors flex items-center gap-1 ${
                   sortBy === key
-                    ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                    ? 'bg-red-100 text-red-700 border border-red-200'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
@@ -379,7 +379,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                     }
                     min={1990}
                     max={currentYear}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
                     placeholder="1990"
                   />
                 </div>
@@ -396,7 +396,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                     }
                     min={1990}
                     max={currentYear}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
                     placeholder={String(currentYear)}
                   />
                 </div>
@@ -424,7 +424,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
           {f.selectedBrands.map((brand) => (
             <span
               key={brand}
-              className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm flex items-center gap-1"
+              className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-sm flex items-center gap-1"
             >
               {brand}
               <button

@@ -85,7 +85,7 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ isOpen, onClose, or
                 <span className="text-sm font-medium text-gray-700">Estado</span>
               </div>
               <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                order.status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
+                order.status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
               }`}>
                 {mapBackendStatus(order.status)}
               </span>
@@ -152,13 +152,13 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ isOpen, onClose, or
           </div>
 
           {/* Total */}
-          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+          <div className="bg-red-50 p-4 rounded-lg border border-red-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <DollarSign className="h-5 w-5 text-blue-600 mr-2" />
-                <span className="text-lg font-medium text-blue-900">Total de la Orden</span>
+                <DollarSign className="h-5 w-5 text-red-600 mr-2" />
+                <span className="text-lg font-medium text-red-900">Total de la Orden</span>
               </div>
-              <span className="text-xl font-bold text-blue-900">
+              <span className="text-xl font-bold text-red-900">
                 {formatPrice(parseFloat(order.orderDetails?.price || "0"))}
               </span>
             </div>
@@ -182,7 +182,7 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ isOpen, onClose, or
         <div className="flex justify-end p-6 border-t border-gray-200 bg-gray-50">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+            className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
           >
             Cerrar
           </button>

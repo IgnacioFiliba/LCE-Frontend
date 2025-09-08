@@ -225,7 +225,7 @@ const UserProfile = () => {
         return <Package className="w-4 h-4 text-yellow-500" />;
       case "processing":
       case "onPreparation":
-        return <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />;
+        return <Loader2 className="w-4 h-4 text-red-500 animate-spin" />;
       case "shipped":
       case "inTransit":
         return <Truck className="w-4 h-4 text-purple-500" />;
@@ -258,7 +258,7 @@ const UserProfile = () => {
         return "bg-yellow-100 text-yellow-800 border-yellow-200";
       case "processing":
       case "onPreparation":
-        return "bg-blue-100 text-blue-800 border-blue-200";
+        return "bg-blue-100 text-red-800 border-red-200";
       case "shipped":
       case "inTransit":
         return "bg-purple-100 text-purple-800 border-purple-200";

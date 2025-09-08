@@ -122,14 +122,14 @@ const SearchBarWithAPI: React.FC<SearchBarWithAPIProps> = ({
             value={searchTerm}
             onChange={handleSearchChange}
             onKeyDown={handleKeyDown}
-            className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
           />
 
           {/* Loading spinner en el input */}
           {loading && (
             <div className="absolute right-10 top-1/2 transform -translate-y-1/2">
               <Loader2
-                className="animate-spin text-blue-500"
+                className="animate-spin text-red-500"
                 size={16}
               />
             </div>
@@ -150,7 +150,7 @@ const SearchBarWithAPI: React.FC<SearchBarWithAPIProps> = ({
         <button
           onClick={handleManualSearch}
           disabled={!searchTerm.trim() || loading}
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+          className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
         >
           {loading ? (
             <Loader2
@@ -168,7 +168,7 @@ const SearchBarWithAPI: React.FC<SearchBarWithAPIProps> = ({
       {searchTerm && (
         <div className="mb-4">
           {loading && (
-            <div className="flex items-center gap-2 text-blue-600">
+            <div className="flex items-center gap-2 text-red-600">
               <Loader2
                 className="animate-spin"
                 size={16}

@@ -122,7 +122,7 @@ export default function UsersBanTable() {
     }
     if (user.isAdmin) {
       return (
-        <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200 border-blue-200">
+        <Badge className="bg-red-100 text-red-800 hover:bg-red-200 border-red-200">
           <ShieldAlert className="w-3 h-3 mr-1" />
           Admin
         </Badge>
@@ -164,7 +164,7 @@ export default function UsersBanTable() {
         <Card>
           <CardContent className="flex items-center justify-center py-12">
             <div className="flex items-center space-x-2">
-              <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+              <Loader2 className="h-6 w-6 animate-spin text-red-600" />
               <span className="text-gray-600">Cargando usuarios...</span>
             </div>
           </CardContent>
@@ -199,7 +199,7 @@ export default function UsersBanTable() {
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">
       {/* Header */}
-      <Card className="border-none shadow-lg bg-gradient-to-r from-blue-50 to-indigo-50">
+      <Card className="border-none shadow-lg bg-gradient-to-r from-red-50 to-indigo-50">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
@@ -225,7 +225,7 @@ export default function UsersBanTable() {
                 placeholder="Buscar por nombre, email, país o ciudad..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 h-10 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                className="pl-10 h-10 border-gray-200 focus:border-red-500 focus:ring-red-500"
               />
             </div>
 
@@ -250,7 +250,7 @@ export default function UsersBanTable() {
           {/* Contador de filtros */}
           <div className="mt-4 text-sm text-gray-600 bg-gray-50 rounded-lg p-3">
             Mostrando{" "}
-            <span className="font-semibold text-blue-600">
+            <span className="font-semibold text-red-600">
               {filteredUsers.length}
             </span>{" "}
             de <span className="font-semibold">{users.length}</span> usuarios
@@ -275,18 +275,18 @@ export default function UsersBanTable() {
             {filteredUsers.map((user) => (
               <Card
                 key={user.id}
-                className="shadow-md hover:shadow-lg transition-shadow duration-200 border-l-4 border-l-blue-500"
+                className="shadow-md hover:shadow-lg transition-shadow duration-200 border-l-4 border-l-red-500"
               >
                 <CardContent className="p-6">
                   <div className="flex flex-col lg:flex-row lg:items-center justify-between space-y-4 lg:space-y-0">
                     {/* Usuario info */}
                     <div className="flex items-start space-x-4 flex-1">
-                      <Avatar className="h-16 w-16 ring-2 ring-blue-100">
+                      <Avatar className="h-16 w-16 ring-2 ring-red-100">
                         <AvatarImage
                           src={user.imgUrl || undefined}
                           alt={user.name}
                         />
-                        <AvatarFallback className="bg-blue-100 text-blue-600 font-semibold text-lg">
+                        <AvatarFallback className="bg-red-100 text-red-600 font-semibold text-lg">
                           {getInitials(user.name)}
                         </AvatarFallback>
                       </Avatar>
@@ -410,7 +410,7 @@ export default function UsersBanTable() {
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <div className="px-3 py-1 text-sm bg-blue-50 text-blue-600 rounded">
+            <div className="px-3 py-1 text-sm bg-red-50 text-red-600 rounded">
               {pagination.page}
             </div>
             <Button

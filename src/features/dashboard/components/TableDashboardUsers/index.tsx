@@ -386,7 +386,7 @@ const UsersTable: React.FC = () => {
         </div>
         <div className="p-8">
           <div className="flex items-center justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
           </div>
         </div>
       </div>
@@ -413,7 +413,7 @@ const UsersTable: React.FC = () => {
                 {canManageUsers && (
                   <Badge
                     variant="outline"
-                    className="bg-blue-50 text-blue-700 border-blue-200"
+                    className="bg-red-50 text-red-700 border-red-200"
                   >
                     <Shield className="h-3 w-3 mr-1" />
                     Admin
@@ -445,7 +445,7 @@ const UsersTable: React.FC = () => {
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   handleSearch(e.target.value)
                 }
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 disabled={loading}
               />
             </div>
