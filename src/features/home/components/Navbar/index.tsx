@@ -1,6 +1,7 @@
 "use client"
 
-import Link from "next/link"
+import Image from "next/image";
+import Link from "next/link";
 import { useState, useEffect, useRef } from "react"
 import {
   Menu,
@@ -29,6 +30,10 @@ import {
 import useAuth from "@/features/login/hooks/useAuth"
 // ✅ IMPORTAR el hook del carrito
 import { useCartContext } from "../../../cart/context/index" // Ajusta la ruta según tu estructura
+
+const LOGO_URL =
+  "https://res.cloudinary.com/dfzmki6ew/image/upload/v1757308029/products/nvcqdlga7tdfacrr6sgw.png";
+
 
 const Navbar = () => {
   const [open, setOpen] = useState(false)
@@ -247,37 +252,43 @@ const Navbar = () => {
           variants={logoVariants}
           whileHover=""
         >
-          <Link
-            href="/home"
-            className="group relative"
-          >
-            <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-700 rounded-xl blur-lg"
-              animate={{
-                scale: [1, 1.2, 1],
-                opacity: [0.3, 0.6, 0.3],
-              }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-            
-            <motion.span
-              className="relative z-10 text-2xl md:text-3xl font-bold bg-gradient-to-r from-white via-red-200 to-white bg-clip-text text-transparent"
-              whileHover={{
-                backgroundSize: "200% 200%",
-                backgroundPosition: "100% 0%",
-              }}
-            >
-              La Casa del Embrague
-            </motion.span>
-            {/* Efectos de chispas */}
-            <motion.div
-              className="absolute -top-1 -right-1"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-            >
-              
-            </motion.div>
-          </Link>
+          <Link href="/home" className="group relative inline-block" aria-label="Ir a Home">
+  {/* Glow de fondo */}
+  <motion.div
+    className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-700 rounded-xl blur-lg"
+    animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
+    transition={{ duration: 2, repeat: Infinity }}
+  />
+  
+  {/* Contenido: logo + texto */}
+  <div className="relative z-10 flex items-center gap-3 md:gap-4">
+    <motion.div whileHover={{ scale: 1.05 }} className="shrink-0">
+      <Image
+        src={LOGO_URL}
+        alt="Logo LCE"
+        width={40}
+        height={40}
+        className="h-8 w-8 md:h-10 md:w-10 rounded-full ring-2 ring-white/60 transition group-hover:ring-red-200"
+        priority
+      />
+    </motion.div>
+
+    <motion.span
+      className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-white via-red-200 to-white bg-clip-text text-transparent"
+      style={{ backgroundSize: "100% 100%" }}
+      whileHover={{ backgroundSize: "200% 200%", backgroundPosition: "100% 0%" }}
+    >
+      La Casa del Embrague
+    </motion.span>
+  </div>
+
+  {/* (opcional) contenedor de chispas */}
+  <motion.div
+    className="absolute -top-1 -right-1"
+    animate={{ rotate: 360 }}
+    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+  />
+</Link>
         </motion.div>
 
         {/* Desktop Nav ultra dinámico */}
