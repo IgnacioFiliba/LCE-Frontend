@@ -71,12 +71,10 @@ const ButtonAdmin: React.FC<Props> = ({ user, className }) => {
 
         {/* Texto + subtexto */}
         <span className="flex flex-col items-start leading-tight">
-          <span className="inline-flex items-center gap-2 text-sm text-gray-300">
-            <LayoutDashboard className="h-4 w-4 text-gray-400" />
-            Panel
-          </span>
+          
           <span className="text-base font-bold tracking-wide">
-            DASHBOARD
+            <LayoutDashboard className="h-4 w-4 text-gray-400" />
+            Panel de Admin
           </span>
         </span>
 
