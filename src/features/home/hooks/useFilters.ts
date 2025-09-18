@@ -58,7 +58,6 @@ const useProductsFiltered = ({
     models?: string[];
     engines?: string[];
     categoryId?: string | null;
-    // extras que soporta tu service
     sortBy?: "name" | "price" | "year" | "brand" | "model" | "engine" | "stock";
     sortOrder?: "asc" | "desc";
   } = useMemo(() => {
@@ -67,13 +66,11 @@ const useProductsFiltered = ({
     const params: any = {
       limit,
       page,
-      search: isSearchActive ? trimmedSearch : undefined, // 👈 activa búsqueda
+      search: isSearchActive ? trimmedSearch : undefined,
       sortBy,
       sortOrder,
     };
 
-    // ⚠️ Importante: NO enviar yearMin / yearMax cuando hay búsqueda activa
-    // porque muchos productos no tienen "year" y el backend los excluye.
     if (!isSearchActive) {
       if (filters.yearRange?.min && filters.yearRange.min > 0) {
         params.yearMin = filters.yearRange.min;
@@ -87,7 +84,6 @@ const useProductsFiltered = ({
       }
     }
 
-    // Brand/Model/Engine como arrays
     if (filters.selectedBrands?.length) {
       params.brands = filters.selectedBrands;
     }
@@ -98,14 +94,10 @@ const useProductsFiltered = ({
       params.engines = filters.selectedEngines;
     }
 
-    // Category
     if (filters.categoryId) {
       params.categoryId = filters.categoryId;
     }
 
-    if (typeof window !== "undefined") {
-      console.log("🔧 [useProductsFiltered] apiParams:", params);
-    }
     return params;
   }, [limit, page, trimmedSearch, isSearchActive, filters, sortBy, sortOrder]);
 
@@ -145,37 +137,44 @@ const useProductsFiltered = ({
     }
   }, [apiParams]);
 
-  // ------- Fetch facets (una sola vez) -------
+  // ------- Fetch facets dinámicas según filtros -------
   const fetchFacets = useCallback(async () => {
     try {
-      const facets = await filtersService.getFacets();
-      setAvailableBrands(facets.brands || []);
-      setAvailableModels(facets.models || []);
-      setAvailableEngines(facets.engines || []);
-      setAvailableCategories(facets.categories || []);
+      const facetParams = {
+        // 🔑 Lo central para tu caso: marcas
+        brands: filters.selectedBrands?.length ? filters.selectedBrands : undefined,
+        // mantener consistencia con el resto de filtros activos
+        models: filters.selectedModels?.length ? filters.selectedModels : undefined,
+        engines: filters.selectedEngines?.length ? filters.selectedEngines : undefined,
+        categoryId: filters.categoryId || undefined,
+        // respeta años si no hay búsqueda activa (evita excluir por year al buscar texto)
+        yearMin: !isSearchActive ? (apiParams as any).yearMin : undefined,
+        yearMax: !isSearchActive ? (apiParams as any).yearMax : undefined,
+        // si querés también cruzar por precio/stock/búsqueda, podés agregar:
+        priceMin: (apiParams as any).priceMin,
+        priceMax: (apiParams as any).priceMax,
+        inStock: (apiParams as any).inStock,
+        search: (apiParams as any).search,
+      };
+
+      const facets = await filtersService.getFacets(facetParams);
+      const nextBrands = facets.brands || [];
+      const nextModels = facets.models || [];
+      const nextEngines = facets.engines || [];
+      const nextCategories = facets.categories || [];
+
+      setAvailableBrands(nextBrands);
+      setAvailableModels(nextModels);
+      setAvailableEngines(nextEngines);
+      setAvailableCategories(nextCategories);
     } catch (e) {
-      console.warn("⚠️ Facets endpoint no disponible, usando fallback");
+      console.warn("⚠️ Facets endpoint no disponible o error; usando fallback derivado si aplica");
       try {
-        const sample = await filtersService.getProducts({ limit: 1000 });
-        const brands = Array.from(
-          new Set(sample.map((p: any) => p.brand).filter(Boolean))
-        ).sort();
-        const models = Array.from(
-          new Set(sample.map((p: any) => p.model).filter(Boolean))
-        ).sort();
-        const engines = Array.from(
-          new Set(sample.map((p: any) => p.engine).filter(Boolean))
-        ).sort();
-        const cMap = new Map<string, string>();
-        sample.forEach((p: any) => {
-          const id = p.category?.id || p.categoryId;
-          const name = p.category?.name || p.categoryName;
-          if (id && name && !cMap.has(id)) cMap.set(id, name);
-        });
-        setAvailableBrands(brands);
-        setAvailableModels(models);
-        setAvailableEngines(engines);
-        setAvailableCategories(Array.from(cMap, ([id, name]) => ({ id, name })));
+        const facets = await filtersService.getFacets();
+        setAvailableBrands(facets.brands || []);
+        setAvailableModels(facets.models || []);
+        setAvailableEngines(facets.engines || []);
+        setAvailableCategories(facets.categories || []);
       } catch (err) {
         console.error("❌ Error derivando facets:", err);
         setAvailableBrands([]);
@@ -184,7 +183,8 @@ const useProductsFiltered = ({
         setAvailableCategories([]);
       }
     }
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters.selectedBrands, filters.selectedModels, filters.selectedEngines, filters.categoryId, isSearchActive, (apiParams as any).yearMin, (apiParams as any).yearMax]);
 
   // Effects
   useEffect(() => {
@@ -197,7 +197,6 @@ const useProductsFiltered = ({
 
   const refetch = useCallback(() => {
     fetchProducts();
-    // fetchFacets(); // normalmente no hace falta refetchear facets en cada refetch
   }, [fetchProducts]);
 
   return {

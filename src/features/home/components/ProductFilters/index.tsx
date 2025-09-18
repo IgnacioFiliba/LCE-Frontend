@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React from 'react';
 import {
   Filter,
   ChevronDown,
@@ -11,7 +11,6 @@ import {
   Search,
 } from 'lucide-react';
 
-/** Si ya tenés FilterState en ../../types/filters, importalo y elimina esta definición */
 export type FilterState = {
   selectedBrands: string[];
   selectedModels: string[];
@@ -24,7 +23,7 @@ export interface ProductFiltersProps {
   filters: FilterState;
   onFilterChange: (patch: Partial<FilterState>) => void;
 
-  // Facets del backend
+  // Facets ya filtradas que vienen del hook
   availableBrands: string[];
   availableModels: string[];
   availableEngines: string[];
@@ -61,11 +60,11 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
   placeholder = 'Todas',
   className = '',
 }) => {
-  const [open, setOpen] = useState(false);
-  const [q, setQ] = useState('');
-  const ref = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = React.useState(false);
+  const [q, setQ] = React.useState('');
+  const ref = React.useRef<HTMLDivElement>(null);
 
-  const filtered = useMemo(() => {
+  const filtered = React.useMemo(() => {
     if (!q.trim()) return options;
     const s = q.toLowerCase();
     return options.filter((o) => o.toLowerCase().includes(s));
@@ -79,8 +78,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
     }
   };
 
-  // Cerrar al clickear fuera
-  useEffect(() => {
+  React.useEffect(() => {
     const onClickOutside = (e: MouseEvent) => {
       if (!ref.current) return;
       if (!ref.current.contains(e.target as Node)) setOpen(false);
@@ -145,9 +143,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
                 );
               })
             ) : (
-              <li className="px-3 py-3 text-sm text-gray-500">
-                Sin opciones.
-              </li>
+              <li className="px-3 py-3 text-sm text-gray-500">Sin opciones.</li>
             )}
           </ul>
 
@@ -228,7 +224,6 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
 }) => {
   const currentYear = new Date().getFullYear();
 
-  // Normalización para seguridad
   const f: FilterState = {
     selectedBrands: filters?.selectedBrands ?? [],
     selectedModels: filters?.selectedModels ?? [],
@@ -238,7 +233,33 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
     categoryId: filters?.categoryId ?? null,
   };
 
-  // Helpers
+  // 🧹 Saneamiento: si alguna selección ya no existe en las facets actuales → quitar
+  React.useEffect(() => {
+    const nextPatch: Partial<FilterState> = {};
+    const keepModels = f.selectedModels.filter((m) => availableModels.includes(m));
+    const keepEngines = f.selectedEngines.filter((e) => availableEngines.includes(e));
+    const keepCategory =
+      f.categoryId && availableCategories.some((c) => c.id === f.categoryId)
+        ? f.categoryId
+        : null;
+
+    let changed = false;
+    if (keepModels.length !== f.selectedModels.length) {
+      nextPatch.selectedModels = keepModels;
+      changed = true;
+    }
+    if (keepEngines.length !== f.selectedEngines.length) {
+      nextPatch.selectedEngines = keepEngines;
+      changed = true;
+    }
+    if (f.categoryId !== keepCategory) {
+      nextPatch.categoryId = keepCategory;
+      changed = true;
+    }
+    if (changed) onFilterChange(nextPatch);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [availableModels, availableEngines, availableCategories]);
+
   const isYearActive = () =>
     f.yearRange.min > 1990 || f.yearRange.max < currentYear;
 
@@ -308,9 +329,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                   <div className="flex items-center gap-1">
                     <SortAsc
                       size={14}
-                      className={`transform ${
-                        sortOrder === 'desc' ? 'rotate-180' : ''
-                      }`}
+                      className={`transform ${sortOrder === 'desc' ? 'rotate-180' : ''}`}
                     />
                     <span className="text-xs">
                       {key === 'year'
@@ -333,6 +352,14 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
       {showFilters && (
         <div className="bg-white border border-gray-200 rounded-xl p-4 mb-4 shadow-sm">
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+
+            <SingleSelect
+              label="Categoría"
+              value={f.categoryId}
+              options={availableCategories}
+              onChange={(v) => onFilterChange({ categoryId: v })}
+            />
+
             <MultiSelect
               label="Marca"
               options={availableBrands}
@@ -354,29 +381,18 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
               onChange={(values) => onFilterChange({ selectedEngines: values })}
             />
 
-            <SingleSelect
-              label="Categoría"
-              value={f.categoryId}
-              options={availableCategories}
-              onChange={(v) => onFilterChange({ categoryId: v })}
-            />
-
-            {/* Año (ocupa dos columnas en desktop) */}
+            {/* Año */}
             <div className="md:col-span-2 xl:col-span-4">
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Año del vehículo
               </label>
               <div className="flex items-center gap-3">
                 <div className="flex-1">
-                  <label className="block text-xs text-gray-500 mb-1">
-                    Desde
-                  </label>
+                  <label className="block text-xs text-gray-500 mb-1">Desde</label>
                   <input
                     type="number"
                     value={f.yearRange.min}
-                    onChange={(e) =>
-                      handleYearChange('min', parseInt(e.target.value, 10))
-                    }
+                    onChange={(e) => handleYearChange('min', parseInt(e.target.value, 10))}
                     min={1990}
                     max={currentYear}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -385,15 +401,11 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                 </div>
                 <span className="text-gray-400 mt-5">-</span>
                 <div className="flex-1">
-                  <label className="block text-xs text-gray-500 mb-1">
-                    Hasta
-                  </label>
+                  <label className="block text-xs text-gray-500 mb-1">Hasta</label>
                   <input
                     type="number"
                     value={f.yearRange.max}
-                    onChange={(e) =>
-                      handleYearChange('max', parseInt(e.target.value, 10))
-                    }
+                    onChange={(e) => handleYearChange('max', parseInt(e.target.value, 10))}
                     min={1990}
                     max={currentYear}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -477,8 +489,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
 
           {f.categoryId && (
             <span className="bg-emerald-100 text-emerald-800 px-2 py-1 rounded-full text-sm flex items-center gap-1">
-              {availableCategories.find((c) => c.id === f.categoryId)?.name ||
-                'Categoría'}
+              {availableCategories.find((c) => c.id === f.categoryId)?.name || 'Categoría'}
               <button onClick={() => onFilterChange({ categoryId: null })}>
                 <X size={12} />
               </button>

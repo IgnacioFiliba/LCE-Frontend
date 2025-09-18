@@ -1,4 +1,3 @@
-// services/service-filters.ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ProductResponse, ProductQueryParams } from "../types/filters";
 import { getApiUrl } from "@/config/urls";
@@ -11,7 +10,7 @@ interface ExtendedProductQueryParams
   categoryId?: string | null;
   models?: string | string[];   // CSV o array
   engines?: string | string[];  // CSV o array
-  brands?: string | string[];   // <-- importante para tu backend
+  brands?: string | string[];   // CSV o array
 }
 
 class FiltersService {
@@ -47,7 +46,7 @@ class FiltersService {
     return headers;
   }
 
-  // helper: añade key con string o con múltiples valores si es array
+  // añade key con string o múltiples valores si es array
   private appendParam(qs: URLSearchParams, key: string, val?: any) {
     if (val === null || val === undefined) return;
     if (!this.ALLOWED_QUERY_PARAMS.includes(key)) return;
@@ -72,14 +71,20 @@ class FiltersService {
     this.appendParam(queryParams, "yearMin", params.yearMin && params.yearMin > 0 ? params.yearMin : null);
     this.appendParam(queryParams, "yearMax", params.yearMax && params.yearMax > 0 ? params.yearMax : null);
     this.appendParam(queryParams, "inStock", params.inStock);
-    this.appendParam(queryParams, "brands", params.brands);     // soporta array
-    this.appendParam(queryParams, "models", params.models);     // soporta array
-    this.appendParam(queryParams, "engines", params.engines);   // soporta array
+    this.appendParam(queryParams, "brands", params.brands);
+    this.appendParam(queryParams, "models", params.models);
+    this.appendParam(queryParams, "engines", params.engines);
     this.appendParam(queryParams, "search", params.search);
     this.appendParam(queryParams, "category", params.category);
     this.appendParam(queryParams, "categoryId", params.categoryId);
 
     return queryParams;
+  }
+
+  private buildQueryParamsLoose(params: Partial<ExtendedProductQueryParams> = {}) {
+    const qp = new URLSearchParams();
+    Object.entries(params).forEach(([k, v]) => this.appendParam(qp, k, v as any));
+    return qp;
   }
 
   async getProducts(params: ExtendedProductQueryParams = {}): Promise<ProductResponse[]> {
@@ -124,7 +129,6 @@ class FiltersService {
       throw new Error("Respuesta inválida del servidor (JSON).");
     }
 
-    // Tu controlador /products devuelve solo items (array)
     if (Array.isArray(data)) return data as ProductResponse[];
     if (data.products) return data.products as ProductResponse[];
     if (data.data) return data.data as ProductResponse[];
@@ -187,7 +191,6 @@ class FiltersService {
   }
 
   async getProductsWithSort(params: ExtendedProductQueryParams = {}): Promise<ProductResponse[]> {
-    // 🔧 FIX: usar this, no self
     const products = await this.getProducts(params);
     if (params.sortBy) {
       return this.sortProductsLocally(products, params.sortBy, params.sortOrder);
@@ -195,15 +198,65 @@ class FiltersService {
     return products;
   }
 
-  // Facets: tu backend NO tiene /products/facets → vamos directo al fallback
-  async getFacets(): Promise<{
+  // ✅ Facets con soporte de filtros (usa /products/facets si existe; si falla, deriva de /products)
+  async getFacets(params: Partial<ExtendedProductQueryParams> = {}): Promise<{
     brands: string[];
     models: string[];
     engines: string[];
     categories: { id: string; name: string }[];
   }> {
-    // Fallback: derivar de productos
-    const products = await this.getProducts({ limit: 1000 });
+    // 1) endpoint oficial
+    try {
+      const qp = this.buildQueryParamsLoose({
+        brands: params.brands,
+        models: params.models,
+        engines: params.engines,
+        categoryId: params.categoryId,
+        yearMin: params.yearMin,
+        yearMax: params.yearMax,
+        priceMin: params.priceMin,
+        priceMax: params.priceMax,
+        inStock: params.inStock,
+        search: params.search,
+      });
+      const endpoint = `/products/facets${qp.toString() ? `?${qp.toString()}` : ""}`;
+      const url = getApiUrl(endpoint);
+
+      const res = await fetch(url, {
+        method: "GET",
+        headers: this.getHeaders(),
+        credentials: "include",
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        return {
+          brands: Array.isArray(data.brands) ? data.brands : [],
+          models: Array.isArray(data.models) ? data.models : [],
+          engines: Array.isArray(data.engines) ? data.engines : [],
+          categories: Array.isArray(data.categories) ? data.categories : [],
+        };
+      }
+      // sigue al fallback si no ok
+    } catch (_) {
+      // sigue al fallback
+    }
+
+    // 2) fallback consistente derivando de /products con mismos filtros
+    const products = await this.getProducts({
+      brands: params.brands,
+      models: params.models,
+      engines: params.engines,
+      categoryId: params.categoryId,
+      yearMin: params.yearMin,
+      yearMax: params.yearMax,
+      priceMin: params.priceMin,
+      priceMax: params.priceMax,
+      inStock: params.inStock,
+      search: params.search,
+      limit: 1000,
+      page: 1,
+    });
 
     const brands = Array.from(
       new Set(products.map((p: any) => p.brand).filter(Boolean))
@@ -223,9 +276,13 @@ class FiltersService {
       const name = p.category?.name || p.categoryName;
       if (id && name && !cMap.has(id)) cMap.set(id, name);
     });
-    const categories = Array.from(cMap, ([id, name]) => ({ id, name }));
 
-    return { brands, models, engines, categories };
+    return {
+      brands,
+      models,
+      engines,
+      categories: Array.from(cMap, ([id, name]) => ({ id, name })),
+    };
   }
 
   async getBrands(): Promise<string[]> {
