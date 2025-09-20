@@ -302,11 +302,13 @@ const PageHome = () => {
         </main>
 
         {/* FAB móvil */}
-        <div className="md:hidden fixed bottom-6 right-6 z-40">
+        <div className="md:hidden fixed right-4 top-[calc(env(safe-area-inset-top)+64px)] z-[60]">
           <ButtonAdmin user={currentUser} />
         </div>
       </div>
-      <ChatWidget />
+      <div className="fixed right-4 z-[60] bottom-[calc(env(safe-area-inset-bottom)+96px)] md:bottom-6">
+          <ChatWidget />
+      </div>
     </LayoutWrapper>
   )
 }
