@@ -116,7 +116,7 @@ const PageHome = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm, filters, sortBy, sortOrder])
 
-  // HANDLERS
+  
   const handleFilterChange = (newFilters: Partial<FilterState>) => {
     setFilters((prev) => ({ ...prev, ...newFilters }))
   }
