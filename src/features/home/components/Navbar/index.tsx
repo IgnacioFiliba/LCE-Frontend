@@ -261,7 +261,7 @@ const Navbar = () => {
               Proveedores
             </Link>
 
-            {/* Botón Descargar Excel (usa <a> para atributo download) */}
+            {/* Botón Descargar Excel (usa <a> para atributo download)
             <a
               href={PROVIDERS_EXCEL_URL}
               download
@@ -271,7 +271,7 @@ const Navbar = () => {
             >
               <Download className="w-4 h-4" />
               Excel
-            </a>
+            </a> */}
           </motion.div>
 
           {/* ---------- Carrito ---------- */}
