@@ -12,7 +12,7 @@ import LayoutWrapper from "@/shared/Wrapper"
 import { useProductsFiltered } from "@/features/home/hooks/useFilters"
 import ChatWidget from "@/features/chat/components/ChatWidget"
 
-// UI (shadcn) + icons
+
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
